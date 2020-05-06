@@ -34,6 +34,16 @@ namespace API
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+
+            services.AddCors(opt => {
+                opt.AddPolicy("CorsPolicy", policy => {
+                    policy
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:3000");
+                });
+            });
+
             services.AddControllers();
 
             
@@ -49,6 +59,8 @@ namespace API
 
             //TODO: enable before going live
             //app.UseHttpsRedirection();
+
+            app.UseCors("CorsPolicy"); //name of policy defined in ConfigureServices method above
 
             app.UseRouting();
 
