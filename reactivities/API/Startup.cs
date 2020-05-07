@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Persistence;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
+using Application.Activities;
 
 namespace API
 {
@@ -43,6 +45,9 @@ namespace API
                     .WithOrigins("http://localhost:3000");
                 });
             });
+
+            // Any class from the assembly where I have it (any class inside Application project)
+            services.AddMediatR(typeof(List).Assembly); 
 
             services.AddControllers();
 
