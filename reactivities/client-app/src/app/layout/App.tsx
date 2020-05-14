@@ -7,9 +7,11 @@ import { NavBar } from "../../features/nav/NavBar";
 
 const App = () => {
   const [activities, setActivities] = useState<IActivity[]>([]);
+
   const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(
     null
   );
+
   const [editMode, setEditMode] = useState(false); //intitial value to be false
 
   const handleSelectActivity = (id: string) => {
@@ -19,19 +21,43 @@ const App = () => {
   const handleOpenCreateForm = () => {
     setSelectedActivity(null);
     setEditMode(true);
+  };
+
+  const handleCreateActivity = (activity: IActivity) => {
+    setActivities([...activities, activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  };
+
+  const handleEditActivity = (activity: IActivity) => {
+    setActivities([...activities.filter((a) => a.id !== activity.id), activity, ]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  };
+
+  const handleDeleteActivity = (id: string) => {
+    setActivities([...activities.filter(a=>a.id !== id)]);
   }
 
   useEffect(() => {
     axios
       .get<IActivity[]>("http://localhost:5000/api/activities")
       .then((response) => {
-        setActivities(response.data);
+        let activities: IActivity[] = [];
+        response.data.forEach(a => 
+          {
+            a.date = a.date.split('.')[0];
+            activities.push(a);
+          }
+        );
+
+        setActivities(activities);
       });
   }, []); //this prevents to call the api again and again and again
 
   return (
     <Fragment>
-      <NavBar openCreateForm={handleOpenCreateForm}/>
+      <NavBar openCreateForm={handleOpenCreateForm} />
       <Container style={{ marginTop: "7em" }}>
         <ActivityDashboard
           activities={activities}
@@ -40,6 +66,9 @@ const App = () => {
           editMode={editMode}
           setEditMode={setEditMode}
           setSelectedActivity={setSelectedActivity}
+          createActivity={handleCreateActivity}
+          editActivity={handleEditActivity}
+          deleteActivity={handleDeleteActivity}
         />
       </Container>
     </Fragment>
