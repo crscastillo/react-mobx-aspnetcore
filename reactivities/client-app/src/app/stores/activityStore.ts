@@ -3,7 +3,7 @@ import { createContext, SyntheticEvent } from 'react';
 import { IActivity } from '../models/activity';
 import agent from '../api/agent';
 
-configure({ enforceActions: 'always' });
+configure({enforceActions: 'always'});
 
 class ActivityStore {
   @observable activityRegistry = new Map();
@@ -17,15 +17,14 @@ class ActivityStore {
   }
 
   groupActivitiesByDate(activities: IActivity[]) {
-    const sortedActivites = activities.sort(
+    const sortedActivities = activities.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
     )
-
-    return Object.entries(sortedActivites.reduce((activities, activity) => {
+    return Object.entries(sortedActivities.reduce((activities, activity) => {
       const date = activity.date.split('T')[0];
       activities[date] = activities[date] ? [...activities[date], activity] : [activity];
       return activities;
-    }, {} as { [key: string]: IActivity[] }));
+    }, {} as {[key: string]: IActivity[]}));
   }
 
   @action loadActivities = async () => {
@@ -55,14 +54,14 @@ class ActivityStore {
       this.loadingInitial = true;
       try {
         activity = await agent.Activities.details(id);
-        runInAction('getting activity', () => {
+        runInAction('getting activity',() => {
           this.activity = activity;
           this.loadingInitial = false;
         })
       } catch (error) {
         runInAction('get activity error', () => {
           this.loadingInitial = false;
-        });
+        })
         console.log(error);
       }
     }
@@ -101,7 +100,6 @@ class ActivityStore {
         this.activity = activity;
         this.submitting = false;
       })
-
     } catch (error) {
       runInAction('edit activity error', () => {
         this.submitting = false;
