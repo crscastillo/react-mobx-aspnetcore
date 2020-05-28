@@ -1,8 +1,8 @@
-using System;
+﻿using System;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Persistence;
 
@@ -12,13 +12,13 @@ namespace API
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-
-            // TODO: This run pending EF migrations when api is started
+            var host = CreateWebHostBuilder(args).Build();
+            
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                try
+                try 
+                
                 {
                     var context = services.GetRequiredService<DataContext>();
                     context.Database.Migrate();
@@ -27,18 +27,15 @@ namespace API
                 catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error ocurred duringg migration");
+                    logger.LogError(ex, "An error occured during migration");
                 }
             }
 
             host.Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
     }
 }
