@@ -2,6 +2,7 @@
 using API.Middleware;
 using Application.Activities;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using FluentValidation.AspNetCore;
 using Infrasturcture.Security;
@@ -36,6 +37,7 @@ namespace API
             //order is not important in this method... but it is in the one below void Configure(IAppli....)
             services.AddDbContext<DataContext>(opt =>
             {
+                opt.UseLazyLoadingProxies();
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddCors(opt =>
@@ -47,6 +49,7 @@ namespace API
             });
             // Any class from the assembly where I have it (any class inside Application project)
             services.AddMediatR(typeof(List.Handler).Assembly);
+            services.AddAutoMapper(typeof(List.Handler));
             services.AddMvc(
                 opt =>
             {
@@ -63,6 +66,13 @@ namespace API
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identityBuilder.AddEntityFrameworkStores<DataContext>();
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
+
+            // Add security policy for IsHost
+            services.AddAuthorization(opt=> opt.AddPolicy("IsActivityHost", policy => {
+                policy.Requirements.Add(new IsHostRequirement());
+            }));
+
+            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"])); // move to the server and make match with the one in JwtGenerator.cs
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
