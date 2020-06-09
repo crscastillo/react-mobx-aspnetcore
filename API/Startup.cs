@@ -5,6 +5,7 @@ using Application.Interfaces;
 using AutoMapper;
 using Domain;
 using FluentValidation.AspNetCore;
+using Infrasturcture.Photos;
 using Infrasturcture.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -68,7 +69,8 @@ namespace API
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
 
             // Add security policy for IsHost
-            services.AddAuthorization(opt=> opt.AddPolicy("IsActivityHost", policy => {
+            services.AddAuthorization(opt => opt.AddPolicy("IsActivityHost", policy =>
+            {
                 policy.Requirements.Add(new IsHostRequirement());
             }));
 
@@ -90,6 +92,11 @@ namespace API
             //Custom interfaces and implementations
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccessor, UserAccessor>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+
+            //Cloudinary settings
+            services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

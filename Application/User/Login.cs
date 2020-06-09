@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Application.User
             private readonly SignInManager<AppUser> _signInManager;
             private readonly IJwtGenerator _jwtGenerator;
             public Handler(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IJwtGenerator jwtGenerator)
-            {                
+            {
                 _signInManager = signInManager;
                 _userManager = userManager;
                 _jwtGenerator = jwtGenerator;
@@ -51,13 +52,13 @@ namespace Application.User
                 var results = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
                 if (results.Succeeded)
-                {                    
+                {
                     return new User
                     {
                         DisplayName = user.DisplayName,
                         Token = _jwtGenerator.CreateToken(user),
                         Username = user.UserName,
-                        Image = null
+                        Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
                     };
                 }
 
