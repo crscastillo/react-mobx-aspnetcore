@@ -22,11 +22,11 @@ namespace Application.Activities
         public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;
-            private readonly IUserAccessor _userAccesor;
+            private readonly IUserAccessor _userAccessor;
             public Handler(DataContext context, IUserAccessor userAccesor)
             {
                 _context = context;
-                _userAccesor = userAccesor;
+                _userAccessor = userAccesor;
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
@@ -37,7 +37,7 @@ namespace Application.Activities
                     throw new RestException(HttpStatusCode.NotFound, new { ActivityDto = "Could not find activity" });
                 }
 
-                var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName.Equals(_userAccesor.GetCurrentUsername()));
+                var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName.Equals(_userAccessor.GetCurrentUsername()));
 
                 var attendance = await _context.UserActivities.SingleOrDefaultAsync(x => x.ActivityId.Equals(activity.Id) && x.AppUserId.Equals(user.Id));
 
